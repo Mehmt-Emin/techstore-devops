@@ -143,7 +143,14 @@ pipeline {
                 """
             }
         }
-
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    pip install -r requirements.txt
+                    pip install webdriver-manager
+                '''
+            }
+        }
         // ── 9. SMOKE TEST ───────────────────────────────────────
         stage('Smoke Test') {
             steps {
