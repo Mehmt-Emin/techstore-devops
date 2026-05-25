@@ -68,8 +68,6 @@ pipeline {
                             -Dsonar.sources=. \
                             -Dsonar.exclusions=venv/**,tests/**,**/__pycache__/** \
                             -Dsonar.python.coverage.reportPaths=coverage.xml \
-                            -Dsonar.host.url=${SONAR_HOST} \
-                            -Dsonar.login=${SONAR_TOKEN}
                     '''
                 }
             }
