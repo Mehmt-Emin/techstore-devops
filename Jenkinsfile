@@ -27,16 +27,17 @@ pipeline {
                     . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
+                    pip install pytest-cov
                 '''
                 echo "✅ Python sanal ortamı hazır"
             }
         }
 
-        // ── 3. BİRİM TESTLERİ ──────────────────────────────────
-        stage('Unit Tests') {
+       stage('Unit Tests') {
             steps {
                 sh '''
                     . venv/bin/activate
+                     mkdir -p test-results
                     pytest tests/test_app.py \
                         -v \
                         --tb=short \
@@ -52,7 +53,7 @@ pipeline {
                     publishCoverage adapters: [coberturaAdapter('coverage.xml')]
                 }
             }
-        }
+        }  
 
         // ── 4. KOD KALİTE ANALİZİ ──────────────────────────────
         stage('SonarQube Analysis') {
