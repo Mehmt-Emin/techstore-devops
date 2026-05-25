@@ -60,9 +60,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
+                    def scannerHome = tool 'SonarScanner'
                     sh '''
                         . venv/bin/activate
-                        sonar-scanner \
+                        ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=techstore \
                             -Dsonar.projectName="TechStore E-Commerce" \
                             -Dsonar.sources=. \
