@@ -148,6 +148,11 @@ pipeline {
         stage('Smoke Test') {
             steps {
                 sh '''
+                    echo "⏳ Servis ayağa kalkıyor bekleniyor..."
+
+                    # kısa bekleme (servisin oturması için)
+                    sleep 10
+
                     # /health endpoint kontrol
                     STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://host.docker.internal:5000/health)
                     if [ "$STATUS" != "200" ]; then
