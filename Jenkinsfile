@@ -136,7 +136,7 @@ pipeline {
                         --name techstore-app \
                         --restart unless-stopped \
                         -p 5000:5000 \
-                        ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest
+                        mhmtemin/techstore-app:latest
 
                     echo "⏳ Sağlık kontrolü bekleniyor..."
                     sleep 10
