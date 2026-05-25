@@ -35,25 +35,35 @@ pipeline {
 
         // ── 3. BİRİM TESTLERİ ──────────────────────────────────
         stage('Unit Tests') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    pytest tests/test_app.py \
-                        -v \
-                        --tb=short \
-                        --junit-xml=test-results/unit-tests.xml \
-                        --cov=app \
-                        --cov-report=xml:coverage.xml \
-                        --cov-report=term-missing
-                '''
-            }
-            post {
-                always {
-                    junit 'test-results/unit-tests.xml'
+    steps {
+        sh '''
+            . venv/bin/activate
+
+            export PYTHONPATH=$WORKSPACE
+
+            pytest tests/test_app.py \
+                -v \
+                --tb=short \
+                --junit-xml=test-results/unit-tests.xml \
+                --cov=app \
+                --cov-report=xml:coverage.xml \
+                --cov-report=term-missing
+        '''
+    }
+    post {
+        always {
+            junit 'test-results/unit-tests.xml'
+
+            script {
+                if (fileExists('coverage.xml')) {
                     publishCoverage adapters: [coberturaAdapter('coverage.xml')]
+                } else {
+                    echo "⚠️ coverage.xml bulunamadı"
                 }
             }
         }
+    }
+}
 
         // ── 4. KOD KALİTE ANALİZİ ──────────────────────────────
         stage('SonarQube Analysis') {
