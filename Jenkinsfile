@@ -59,21 +59,24 @@ pipeline {
         // ── 4. KOD KALİTE ANALİZİ ──────────────────────────────
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                def scannerHome = tool 'SonarScanner'
+                script {
+                    withSonarQubeEnv('SonarQube') {
 
-                sh """
-                    . venv/bin/activate
-                    ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=techstore \
-                        -Dsonar.projectName="TechStore E-Commerce" \
-                        -Dsonar.sources=. \
-                        -Dsonar.exclusions=venv/**,tests/**,**/__pycache__/** \
-                        -Dsonar.python.coverage.reportPaths=coverage.xml
-            """
+                        def scannerHome = tool 'SonarScanner'
+
+                        sh """
+                            . venv/bin/activate
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=techstore \
+                                -Dsonar.projectName="TechStore E-Commerce" \
+                                -Dsonar.sources=. \
+                                -Dsonar.exclusions=venv/**,tests/**,**/__pycache__/** \
+                                -Dsonar.python.coverage.reportPaths=coverage.xml
+                        """
+                    }
+                }
+            }
         }
-    }
-}
 
         // ── 5. KALİTE KAPISI ───────────────────────────────────
         stage('Quality Gate') {
