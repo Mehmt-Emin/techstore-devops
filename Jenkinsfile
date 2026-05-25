@@ -37,6 +37,7 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
+                     mkdir -p test-results
                     pytest tests/test_app.py \
                         -v \
                         --tb=short \
