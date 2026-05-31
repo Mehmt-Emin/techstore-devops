@@ -27,7 +27,6 @@ pipeline {
                     . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
-                    pip install pytest-cov
                 '''
                 echo "✅ Python sanal ortamı hazır"
             }
@@ -37,7 +36,6 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    export PYTHONPATH=$WORKSPACE
                     mkdir -p test-results
                     pytest tests/test_app.py \
                         -v \
@@ -59,21 +57,18 @@ pipeline {
         // ── 4. KOD KALİTE ANALİZİ ──────────────────────────────
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    withSonarQubeEnv('SonarQube') {
-
-                        def scannerHome = tool 'SonarScanner'
-
-                        sh """
-                            . venv/bin/activate
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=techstore \
-                                -Dsonar.projectName="TechStore E-Commerce" \
-                                -Dsonar.sources=. \
-                                -Dsonar.exclusions=venv/**,tests/**,**/__pycache__/** \
-                                -Dsonar.python.coverage.reportPaths=coverage.xml
-                        """
-                    }
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        . venv/bin/activate
+                        sonar-scanner \
+                            -Dsonar.projectKey=techstore \
+                            -Dsonar.projectName="TechStore E-Commerce" \
+                            -Dsonar.sources=. \
+                            -Dsonar.exclusions=venv/**,tests/**,**/__pycache__/** \
+                            -Dsonar.python.coverage.reportPaths=coverage.xml \
+                            -Dsonar.host.url=${SONAR_HOST} \
+                            -Dsonar.login=${SONAR_TOKEN}
+                    '''
                 }
             }
         }
@@ -159,26 +154,19 @@ pipeline {
         stage('Smoke Test') {
             steps {
                 sh '''
-                    echo "⏳ Servis ayağa kalkıyor bekleniyor..."
-
-                    # kısa bekleme (servisin oturması için)
-                    sleep 10
-
-                    # /health endpoint kontrol
-                    STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://host.docker.internal:5000/health)
+                    STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/health)
                     if [ "$STATUS" != "200" ]; then
-                        echo "❌ Health check başarısız! HTTP: $STATUS"
+                        echo "❌ Health check başarısız"
                         exit 1
                     fi
 
-                    # Ana sayfa kontrol
-                    STATUS2=$(curl -s -o /dev/null -w "%{http_code}" http://host.docker.internal:5000/)
+                    STATUS2=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/)
                     if [ "$STATUS2" != "200" ]; then
-                        echo "❌ Ana sayfa erişilemiyor! HTTP: $STATUS2"
+                        echo "❌ Ana sayfa başarısız"
                         exit 1
                     fi
 
-                    echo "✅ Smoke testleri geçildi"
+                    echo "✅ Smoke test başarılı"
                 '''
             }
         }
