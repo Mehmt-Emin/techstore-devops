@@ -36,6 +36,7 @@ pipeline {
        stage('Unit Tests') {
             steps {
                 sh '''
+                    export PYTHONPATH=.
                     . venv/bin/activate
                     mkdir -p test-results
                     pytest tests/test_app.py \
