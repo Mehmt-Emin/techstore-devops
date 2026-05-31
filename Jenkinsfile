@@ -27,6 +27,7 @@ pipeline {
                     . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
+                    pip install pytest-cov
                 '''
                 echo "✅ Python sanal ortamı hazır"
             }
